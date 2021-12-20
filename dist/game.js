@@ -3004,8 +3004,8 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       link: "https://snyk.io/blog/log4j-rce-log4shell-vulnerability-cve-2021-4428"
     },
     "2": {
-      message: "next one?",
-      link: "https://"
+      message: "The impact of Log4Shell was not fully realized at first, at first glance it appeared to be a bug affecting Minecraft. Shortly after, security researchers caught on that the vulnerable component was the very widely used log4j. With Oracle reporting over 13 billion devices using java, the realization started to set in that this bug could have a much bigger impact than initially thought.",
+      link: void 0
     }
   };
   var BULLET_SPEED = 35;
@@ -3331,7 +3331,9 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
   __name(spawnBullet, "spawnBullet");
   onKeyPress("m", () => {
     if (CHEST_OPEN) {
-      window.open(MESSAGES_POOL[MESSAGES_POOL_CURRENT].link, "_blank");
+      if (MESSAGES_POOL[MESSAGES_POOL_CURRENT].link) {
+        window.open(MESSAGES_POOL[MESSAGES_POOL_CURRENT].link, "_blank");
+      }
     }
   });
   onKeyPress("space", () => {
