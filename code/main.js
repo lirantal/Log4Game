@@ -37,7 +37,7 @@ const MESSAGES_POOL = {
     link: "https://snyk.io/blog/log4j-rce-log4shell-vulnerability-cve-2021-4428"
   },
   "2": {
-    message: 	"The impact of Log4Shell was not fully realized at first, at first glance it appeared to be a bug affecting Minecraft. Shortly after, security researchers caught on that the vulnerable component was the very widely used log4j. With Oracle reporting over 13 billion devices using java, the realization started to set in that this bug could have a much bigger impact than initially thought.",
+    message: 	"The impact of Log4Shell was not fully realized at first, at first glance it appeared to be a bug affecting Minecraft. Shortly after, security researchers caught on that the vulnerable component was the very widely used log4j. With Oracle reporting over 13 billion devices using java, the realization started to set in that this bug could have a much bigger impact than initially thought...",
     link: undefined,
   }
 }
