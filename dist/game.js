@@ -2978,436 +2978,511 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     background: [0, 0, 0]
   });
   loadAssets();
-  var CHEST_OPEN = false;
-  var CHESTS_UNLOCKED_COUNT = 0;
-  var CHESTS_UNLOCKED_STATUS = {
-    "1": {
-      unlocked: false
-    },
-    "2": {
-      unlocked: false
-    },
-    "3": {
-      unlocked: false
-    },
-    "4": {
-      unlocked: false
-    },
-    "5": {
-      unlocked: false
-    }
-  };
-  var MESSAGES_POOL_CURRENT = 0;
-  var MESSAGES_POOL = {
-    "1": {
-      message: "Log4Shell is the name for the vulnerability within the popular Java logging framework Log4j. It was initially published as CVE-2021-44228 with the highest CVSS score of 10\n\n press m to learn more\npress space to close chest and proceed",
-      link: "https://snyk.io/blog/log4j-rce-log4shell-vulnerability-cve-2021-4428"
-    },
-    "2": {
-      message: "The impact of Log4Shell was not fully realized at first, at first glance it appeared to be a bug affecting Minecraft. Shortly after, security researchers caught on that the vulnerable component was the very widely used log4j. With Oracle reporting over 13 billion devices using java, the realization started to set in that this bug could have a much bigger impact than initially thought...",
-      link: void 0
-    }
-  };
-  var BULLET_SPEED = 35;
-  var BULLET_DIRECTION = RIGHT;
-  var PLAYER_HEALTH = 100;
-  layers([
-    "floor",
-    "game",
-    "ui",
-    "onscreentext"
-  ], "game");
-  var health = add([
-    sprite("heart", { anim: "healthy" }),
-    layer("ui"),
-    pos(7, 28),
-    fixed()
-  ]);
-  var chestUnlockedStatus = add([
-    text("chests unlocked: 0 / 10", {
-      size: 6,
-      width: 320,
-      font: "sink"
-    }),
-    pos(2, 2),
-    layer("ui"),
-    fixed()
-  ]);
-  var map = addLevel([
-    "\u250C\u2500\u2500\u2500\u2500\u2500\u2510     \u250C\u2500\u2500)\u2500\u2500\u2500\u2500)\u2500\u2500\u2510     \u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510            \u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510",
-    "\u2502\xB7\xB7\xB7\xB7\xB7\u2514\u2500\u2500\u2500\u2500\u2500\u2518\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2514\u2500\u2500\u2500\u2500\u2500\u2518\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502            \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502",
-    "\u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7m\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502            \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502",
-    "\u2502\xB7\xB7\xB71\xB7\xB7\xB72\xB7\xB7\xB7\xB7\xB7\xB7m\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2514\u2500\u2500\u2500}}\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\xB7\xB7\u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\xB7\xB7\u2502",
-    "\u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7m\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502            \u2502\xB7\xB7\u2502",
-    "\u2502\xB7\xB7\xB7\xB7\xB7\u250C\u2500\u2500\u2500\u2500\u2500\u2510\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u250C\u2500\u2500\u2500\u2500\u2500\u2510\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510 \u2502\xB7\xB7\u2502",
-    "\u2514\u2500\u2500\u2500\u2500\u2500\u2518     \u2514\u2500\u2500)\u2500\u2500\u2500\u2500)\u2500\u2500\u2518     \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500}}\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\u2502",
-    "                                                  \u2502\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\u2502",
-    " \u250C\u2500\u2500\u2500\u2510                                \u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\xB7\xB7\u2502 \u2502\xB7\xB7\u250C\u2500\u2500\u2510\xB7\xB7\u2502 \u2502\xB7\xB7\u2502",
-    "\u250C\u2518\xB7\xB7\xB7\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510    \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\u2502  \u2502\xB7\xB7\u2502 \u2502\xB7\xB7\u2502",
-    "\u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502    \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\u2502  \u2502\xB7\xB7\u2502 \u2502\xB7\xB7\u2502",
-    "\u2514\u2510\xB7\xB7\xB7\u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\xB7\xB7\u2502    \u2502\xB7\xB7\u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518 \u2502\xB7\xB7\u2502  \u2502\xB7\xB7\u2514\u2500\u2518\xB7\xB7\u2502",
-    " \u2514\u2500\u2500\u2500\u2518                        \u2502\xB7\xB7\u2502    \u2502\xB7\xB7\u2502            \u250C\u2518\xB7\xB7\u2514\u2510 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502",
-    "                          \u250C\u2500\u2500\u2500\u2518\xB7\xB7\u2514\u2500\u2500\u2500\u2500\u2518\xB7\xB7\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510 \u2502\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502",
-    "\u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\u2502 \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518",
-    "\u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\u2502          ",
-    "\u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u2514\u2500\u2500\u2500\u2500\u2518          ",
-    "\u2502\xB7\xB7\u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502                 ",
-    "\u2502\xB7\xB7\u2502                      \u2514\u2500\u2500\u2500\u2510\xB7\xB7\u250C\u2500\u2500\u2500\u2500\u2510\xB7\xB7\u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518                 ",
-    "\u2502\xB7\xB7\u2502            \u250C(\u2500(\u2500\u2500(\u2500(\u2510    \u2502\xB7\xB7\u2502    \u2502\xB7\xB7\u2502            \u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510",
-    "\u2502\xB7\xB7\u2502           \u250C\u2518\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2514\u2510   \u2502\xB7\xB7\u2502    \u2502\xB7\xB7\u2502     \u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2518\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502",
-    "\u2502\xB7\xB7\u2502           \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502   \u2502\xB7\xB7\u2502    \u2502\xB7\xB7\u2502     \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502",
-    "\u2502\xB7\xB7\u2502           \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502   \u2502\xB7\xB7\u2502    \u2502\xB7\xB7\u2502     \u2502\xB7\xB7\u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\xB7\xB7\u2502",
-    "\u2502\xB7\xB7\u2502 \u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2514\u2500\u2500\u2500\u2518\xB7\xB7\u2514\u2510  \u250C\u2518\xB7\xB7\u2514\u2510    \u2502\xB7\xB7\u2502               \u2502\xB7\xB7\u2502",
-    "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\u2514\u2500\u2500\u2500\u2500\u2518\xB7\xB7\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510 \u2502\xB7\xB7\u2502",
-    "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\u2502",
-    "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\u2502",
-    "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\u2502",
-    "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\u250C\u2500\u2500\u2500\u2500\u2510\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\u2502",
-    "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u250C\u2500\u2500\u2500\u2510\xB7\xB7\u250C\u2518  \u2514\u2510\xB7\xB7\u250C\u2518    \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\u2502",
-    "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502   \u2502\xB7\xB7\u2502    \u2502\xB7\xB7\u2502     \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\u2502",
-    "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502   \u2502\xB7\xB7\u2502    \u2502\xB7\xB7\u2502     \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\u2502",
-    "\u2502\xB7\xB7\u2502 \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518 \u2514\u2510\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u250C\u2518   \u2502\xB7\xB7\u2502    \u2502\xB7\xB7\u2502     \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\u2502",
-    "\u2502\xB7\xB7\u2502            \u2514(\u2500(\u2500\u2500(\u2500(\u2518    \u2502\xB7\xB7\u2502    \u2502\xB7\xB7\u2502     \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\u2502",
-    "\u2502\xB7\xB7\u2502                          \u2502\xB7\xB7\u2502    \u2502\xB7\xB7\u2502     \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\u2502",
-    "\u2502\xB7\xB7\u2502                          \u2502\xB7\xB7\u2502    \u2502\xB7\xB7\u2502     \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\u2502",
-    "\u2502\xB7\xB7\u2502                          \u2502\xB7\xB7\u2502    \u2502\xB7\xB7\u2502     \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518 \u2502\xB7\xB7\u2502",
-    "\u2502\xB7\xB7\u2502                          \u2502\xB7\xB7\u2502    \u2502\xB7\xB7\u2502                        \u2502\xB7\xB7\u2502",
-    "\u2502\xB7\xB7\u2502 \u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510   \u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2518\xB7\xB7\u2514\u2500\u2500\u2500\u2500\u2518\xB7\xB7\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510  \u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\xB7\xB7\u2502",
-    "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502   \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502",
-    "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502   \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502",
-    "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502   \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502",
-    "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502   \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502",
-    "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518   \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502",
-    "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\u2502                                           \u2502\xB7\xB7\u2514\u2500\u2500\u2518\xB7\xB7\xB7\xB7\u250C\u2500\u2500\u2500\u2500\u2500\u2518",
-    "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\u2502                                           \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502      ",
-    "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\u2502                                           \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502      ",
-    "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510      \u250C\u2500\u2510       \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u250C\u2500\u2500\u2500\u2510",
-    "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502     \u250C\u2518\xB7\u2514\u2510      \u2502\xB7\xB7\u250C\u2500\u2500\u2510\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\u2502",
-    "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502    \u250C\u2518\xB7\xB7\xB7\u2514\u2510     \u2502\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\u2514\u2500\u2518\xB7\xB7\xB7\u2502",
-    "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\u250C\u2500\u2500\u2510\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502   \u250C\u2518\xB7\xB7\xB7\xB7\xB7\u2514\u2510    \u2502\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502",
-    "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502  \u250C\u2518\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2514\u2510   \u2502\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502",
-    "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502   \u2502\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\u250C\u2500\u2510\xB7\xB7\xB7\u2502",
-    "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502  \u2514\u2510\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u250C\u2518   \u2502\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\u2502",
-    "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502   \u2514\u2510\xB7\xB7\xB7\xB7\xB7\u250C\u2518    \u2502\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\u2502 \u2514\u2500\u2500\u2500\u2518",
-    "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502    \u2514\u2510\xB7\xB7\xB7\u250C\u2518     \u2502\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\u2502      ",
-    "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502     \u2514\u2510\xB7\u250C\u2518      \u2502\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\u2514\u2500\u2500\u2500\u2500\u2500\u2510",
-    "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502      \u2514\u2500\u2518       \u2502\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502",
-    "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502                \u2502\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502",
-    "\u2502\xB7\xB7\u2502\u250C\u2518\xB7\xB7\xB7\u2514\u2510 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\u250C\u2500\u2500\u2510\xB7\xB7\u2502",
-    "\u2502\xB7\xB7\u2502\u2502\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\u2502",
-    "\u2502\xB7\xB7\u2502\u2502\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\u2502",
-    "\u2502\xB7\xB7\u2502\u2502\xB7\xB7\xB7\xB7\xB7\u2502 \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518  \u2502\xB7\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\u2502",
-    "\u2502\xB7\xB7\u2502\u2514\u2500\u2500\u2500\u2500\u2500\u2518                                               \u2502\xB7\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\u2502",
-    "\u2502\xB7\xB7\u2502               \u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\xB7\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\u2502",
-    "\u2502\xB7\xB7\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7o\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7o\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\u2502",
-    "\u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7o\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7o\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\u2502",
-    "\u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7o\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7o\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\u2502",
-    "\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7o\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7o\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\u2502",
-    "                    \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\xB7\xB7\xB7\xB7\xB7\u250C\u2500\u2500\u2500\u2500\u2500\u2518  \u2502\xB7\xB7\u2502",
-    "\u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510                                        \u2502\xB7\xB7\xB7\xB7\xB7\u2502        \u2502\xB7\xB7\u2502",
-    "\u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\xB7\xB7\xB7\xB7\xB7\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\xB7\xB7\u2502",
-    "\u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502",
-    "\u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502",
-    "\u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502",
-    "\u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502",
-    "\u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502",
-    "\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518"
-  ], {
-    width: 16,
-    height: 16,
-    "\xB7": () => [
-      origin("center"),
-      sprite("floor", { frame: ~~rand(0, 8) }),
-      layer("floor"),
-      "floor"
-    ],
-    "m": () => [
-      origin("center"),
-      sprite("milestone1"),
-      area(),
-      "milestone1"
-    ],
-    ")": () => [
-      origin("center"),
-      sprite("badge1")
-    ],
-    "(": () => [
-      origin("center"),
-      sprite("badge3")
-    ],
-    "}": () => [
-      origin("center"),
-      sprite("badge2")
-    ],
-    "1": () => [
-      origin("center"),
-      sprite("chest"),
-      area(),
-      solid(),
-      {
-        opened: false,
-        chest_index: 1
+  scene("game", () => {
+    let CHEST_OPEN = false;
+    let CHESTS_UNLOCKED_COUNT = 0;
+    const CHESTS_UNLOCKED_STATUS = {
+      "1": {
+        unlocked: false
       },
-      "chest"
-    ],
-    "2": () => [
-      origin("center"),
-      sprite("chest"),
-      area(),
-      solid(),
-      {
-        opened: false,
-        chest_index: 2
+      "2": {
+        unlocked: false
       },
-      "chest"
-    ],
-    "\u2500": () => [
-      origin("center"),
-      sprite("wall"),
-      area(),
-      solid()
-    ],
-    "\u250C": () => [
-      origin("center"),
-      sprite("wall"),
-      area(),
-      solid()
-    ],
-    "\u2510": () => [
-      origin("center"),
-      sprite("wall"),
-      area(),
-      solid()
-    ],
-    "\u2514": () => [
-      origin("center"),
-      sprite("wall"),
-      area(),
-      solid()
-    ],
-    "\u2518": () => [
-      origin("center"),
-      sprite("wall"),
-      area(),
-      solid()
-    ],
-    "\u2502": () => [
-      origin("center"),
-      sprite("wall"),
-      area(),
-      solid()
-    ]
-  });
-  var player = add([
-    pos(map.getPos(2, 2)),
-    sprite("hero", { anim: "idle" }),
-    area({ width: 12, height: 12, offset: vec2(0, 6) }),
-    solid(),
-    origin("center")
-  ]);
-  player.onCollide("milestone1", () => {
-    const ogre = add([
-      sprite("ogre"),
-      pos(player.pos.sub(-100, 0)),
-      origin("center"),
-      area(),
-      solid(),
-      scale(0.5),
-      "ogre",
-      "enemy"
-    ]);
-  });
-  player.onCollide("enemy", () => {
-    shake(10);
-    PLAYER_HEALTH--;
-    if (PLAYER_HEALTH < 1) {
-      addKaboom();
-      go("lose");
-      return;
-    }
-    if (PLAYER_HEALTH < 10) {
-      addKaboom();
-      shake(120);
-      go("lose");
-      return;
-    }
-    if (PLAYER_HEALTH < 35) {
-      health.play("dying");
-      shake(30);
-      return;
-    }
-    if (PLAYER_HEALTH < 75) {
-      health.play("wounded");
-      shake(30);
-      return;
-    }
-  });
-  var sword = add([
-    pos(),
-    sprite("sword"),
-    origin("bot"),
-    rotate(0),
-    area(),
-    follow(player, vec2(-4, 9)),
-    spin(),
-    "sword"
-  ]);
-  onUpdate(() => {
-    every("ogre", (obj) => {
-      obj.move(-15, 0);
-      if (obj.pos.x < 0) {
-        destroy(obj);
-      }
-    });
-  });
-  function spin() {
-    let spinning = false;
-    return {
-      id: "spin",
-      update() {
-        if (spinning) {
-          this.angle += 800 * dt();
-          if (this.angle >= 360) {
-            this.angle = 0;
-            spinning = false;
-          }
-        }
+      "3": {
+        unlocked: false
       },
-      spin() {
-        spinning = true;
+      "4": {
+        unlocked: false
+      },
+      "5": {
+        unlocked: false
       }
     };
-  }
-  __name(spin, "spin");
-  function updateChestCount(chestIndex) {
-    if (!CHESTS_UNLOCKED_STATUS[chestIndex].unlocked) {
-      CHESTS_UNLOCKED_COUNT++;
-      CHESTS_UNLOCKED_STATUS[chestIndex].unlocked = true;
-      chestUnlockedStatus.text = `chests unlocked ${CHESTS_UNLOCKED_COUNT} / 10`;
-      add([
-        sprite("coin", { anim: "idle" }),
-        layer("ui"),
-        pos(10 * CHESTS_UNLOCKED_COUNT, 12),
-        fixed()
-      ]);
-    }
-  }
-  __name(updateChestCount, "updateChestCount");
-  function showMessageText(chestPoolIndex) {
-    const textBox = add([
-      rect(width() - 30, 50, { radius: 16 }),
-      origin("center"),
-      color(255, 255, 255),
-      pos(player.pos.x, player.pos.y - height() / 4),
-      outline(2),
-      layer("onscreentext"),
-      "messagebox"
-    ]);
-    const textMessage = add([
-      text("", { size: 6, width: width() - 40, font: "apl386" }),
-      pos(textBox.pos),
-      color(0, 0, 0),
-      origin("center"),
-      layer("onscreentext"),
-      "messagebox"
-    ]);
-    MESSAGES_POOL_CURRENT = chestPoolIndex;
-    textMessage.text = MESSAGES_POOL[MESSAGES_POOL_CURRENT].message;
-  }
-  __name(showMessageText, "showMessageText");
-  function spawnBullet(p) {
-    add([
-      rect(4, 2),
-      area(),
-      pos(player.pos.sub(0, 2)),
-      origin("center"),
-      color(255, 255, 255),
-      outline(1),
-      move(BULLET_DIRECTION, BULLET_SPEED),
-      cleanup(),
-      "bullet"
-    ]);
-  }
-  __name(spawnBullet, "spawnBullet");
-  onKeyPress("m", () => {
-    if (CHEST_OPEN) {
-      if (MESSAGES_POOL[MESSAGES_POOL_CURRENT].link) {
-        window.open(MESSAGES_POOL[MESSAGES_POOL_CURRENT].link, "_blank");
+    let MESSAGES_POOL_CURRENT = 0;
+    const MESSAGES_POOL = {
+      "1": {
+        message: "Log4Shell is the name for the vulnerability within the popular Java logging framework Log4j. It was initially published as CVE-2021-44228 with the highest CVSS score of 10\n\n press m to learn more\npress space to close chest and proceed",
+        link: "https://snyk.io/blog/log4j-rce-log4shell-vulnerability-cve-2021-4428"
+      },
+      "2": {
+        message: "The impact of Log4Shell was not fully realized at first, at first glance it appeared to be a bug affecting Minecraft. Shortly after, security researchers caught on that the vulnerable component was the very widely used log4j. With Oracle reporting over 13 billion devices using java, the realization started to set in that this bug could have a much bigger impact than initially thought...",
+        link: void 0
+      },
+      "3": {
+        message: "Did you know?\nIt would only require a malicious actor to craft a string that gets logged by a server running the vulnerable Log4j version, in order to run any Java code or system command remotely.\n\nWhat sort of data gets logged? find more chests to find out!",
+        link: void 0
       }
-    }
-  });
-  onKeyPress("space", () => {
-    let interacted = false;
-    every("chest", (c2) => {
-      if (player.isTouching(c2)) {
-        if (c2.opened) {
-          CHEST_OPEN = false;
-          c2.play("close");
-          c2.opened = false;
-          destroyAll("messagebox");
-        } else {
-          destroyAll("messagebox");
-          CHEST_OPEN = true;
-          c2.play("open");
-          c2.opened = true;
-          showMessageText(c2.chest_index);
-          updateChestCount(c2.chest_index);
-        }
-        interacted = true;
+    };
+    const BULLET_SPEED = 35;
+    let BULLET_DIRECTION = RIGHT;
+    let PLAYER_HEALTH = 100;
+    layers([
+      "floor",
+      "game",
+      "ui",
+      "onscreentext"
+    ], "game");
+    const health = add([
+      sprite("heart", { anim: "healthy" }),
+      layer("ui"),
+      pos(7, 28),
+      fixed()
+    ]);
+    const chestUnlockedStatus = add([
+      text("chests unlocked: 0 / 10", {
+        size: 6,
+        width: 320,
+        font: "sink"
+      }),
+      pos(2, 2),
+      layer("ui"),
+      fixed()
+    ]);
+    const map = addLevel([
+      "\u250C\u2500\u2500\u2500\u2500\u2500\u2510     \u250C\u2500\u2500)\u2500\u2500\u2500\u2500)\u2500\u2500\u2510     \u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510            \u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510",
+      "\u2502\xB7\xB7\xB7\xB7\xB7\u2514\u2500\u2500\u2500\u2500\u2500\u2518\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2514\u2500\u2500\u2500\u2500\u2500\u2518\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502            \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502",
+      "\u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7m\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502            \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502",
+      "\u2502\xB7\xB7\xB71\xB7\xB7\xB72\xB7\xB7\xB7\xB7\xB7\xB7m\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2514\u2500\u2500\u2500}}\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\xB7\xB7\u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\xB7\xB7\u2502",
+      "\u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7m\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502            \u2502\xB7\xB7\u2502",
+      "\u2502\xB7\xB7\xB7\xB7\xB7\u250C\u2500\u2500\u2500\u2500\u2500\u2510\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u250C\u2500\u2500\u2500\u2500\u2500\u2510\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510 \u2502\xB7\xB7\u2502",
+      "\u2514\u2500\u2500\u2500\u2500\u2500\u2518     \u2514\u2500\u2500)\u2500\u2500\u2500\u2500)\u2500\u2500\u2518     \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500}}\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\u2502",
+      "                                                  \u2502\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\u2502",
+      " \u250C\u2500\u2500\u2500\u2510                                \u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\xB7\xB7\u2502 \u2502\xB7\xB7\u250C\u2500\u2500\u2510\xB7\xB7\u2502 \u2502\xB7\xB7\u2502",
+      "\u250C\u2518\xB7\xB7\xB7\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510    \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\u2502  \u2502\xB7\xB7\u2502 \u2502\xB7\xB7\u2502",
+      "\u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502    \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\u2502  \u2502\xB7\xB7\u2502 \u2502\xB7\xB7\u2502",
+      "\u2514\u2510\xB7\xB7\xB7\u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\xB7\xB7\u2502    \u2502\xB7\xB7\u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518 \u2502\xB7\xB7\u2502  \u2502\xB7\xB7\u2514\u2500\u2518\xB7\xB7\u2502",
+      " \u2514\u2500\u2500\u2500\u2518                        \u2502\xB7\xB7\u2502    \u2502\xB7\xB7\u2502            \u250C\u2518\xB7\xB7\u2514\u2510 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502",
+      "                          \u250C\u2500\u2500\u2500\u2518\xB7\xB7\u2514\u2500\u2500\u2500\u2500\u2518\xB7\xB7\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510 \u2502\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502",
+      "\u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\u2502 \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518",
+      "\u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\u2502          ",
+      "\u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u2514\u2500\u2500\u2500\u2500\u2518          ",
+      "\u2502\xB7\xB7\u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502                 ",
+      "\u2502\xB7\xB7\u2502                      \u2514\u2500\u2500\u2500\u2510\xB7\xB7\u250C\u2500\u2500\u2500\u2500\u2510\xB7\xB7\u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518                 ",
+      "\u2502\xB7\xB7\u2502            \u250C(\u2500(\u2500\u2500(\u2500(\u2510    \u2502\xB7\xB7\u2502    \u2502\xB7\xB7\u2502            \u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510",
+      "\u2502\xB7\xB7\u2502           \u250C\u2518\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2514\u2510   \u2502\xB7\xB7\u2502    \u2502\xB7\xB7\u2502     \u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2518\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502",
+      "\u2502\xB7\xB7\u2502           \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502   \u2502\xB7\xB7\u2502    \u2502\xB7\xB7\u2502     \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502",
+      "\u2502\xB7\xB7\u2502           \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502   \u2502\xB7\xB7\u2502    \u2502\xB7\xB7\u2502     \u2502\xB7\xB7\u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\xB7\xB7\u2502",
+      "\u2502\xB7\xB7\u2502 \u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2514\u2500\u2500\u2500\u2518\xB7\xB7\u2514\u2510  \u250C\u2518\xB7\xB7\u2514\u2510    \u2502\xB7\xB7\u2502               \u2502\xB7\xB7\u2502",
+      "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\u2514\u2500\u2500\u2500\u2500\u2518\xB7\xB7\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510 \u2502\xB7\xB7\u2502",
+      "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\u2502",
+      "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\u2502",
+      "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\u2502",
+      "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\u250C\u2500\u2500\u2500\u2500\u2510\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\u2502",
+      "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u250C\u2500\u2500\u2500\u2510\xB7\xB7\u250C\u2518  \u2514\u2510\xB7\xB7\u250C\u2518    \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\u2502",
+      "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502   \u2502\xB7\xB7\u2502    \u2502\xB7\xB7\u2502     \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\u2502",
+      "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502   \u2502\xB7\xB7\u2502    \u2502\xB7\xB7\u2502     \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\u2502",
+      "\u2502\xB7\xB7\u2502 \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518 \u2514\u2510\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u250C\u2518   \u2502\xB7\xB7\u2502    \u2502\xB7\xB7\u2502     \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\u2502",
+      "\u2502\xB7\xB7\u2502            \u2514(\u2500(\u2500\u2500(\u2500(\u2518    \u2502\xB7\xB7\u2502    \u2502\xB7\xB7\u2502     \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\u2502",
+      "\u2502\xB7\xB7\u2502                          \u2502\xB7\xB7\u2502    \u2502\xB7\xB7\u2502     \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\u2502",
+      "\u2502\xB7\xB7\u2502                          \u2502\xB7\xB7\u2502    \u2502\xB7\xB7\u2502     \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\u2502",
+      "\u2502\xB7\xB7\u2502                          \u2502\xB7\xB7\u2502    \u2502\xB7\xB7\u2502     \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518 \u2502\xB7\xB7\u2502",
+      "\u2502\xB7\xB7\u2502                          \u2502\xB7\xB7\u2502    \u2502\xB7\xB7\u2502                        \u2502\xB7\xB7\u2502",
+      "\u2502\xB7\xB7\u2502 \u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510   \u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2518\xB7\xB7\u2514\u2500\u2500\u2500\u2500\u2518\xB7\xB7\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510  \u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\xB7\xB7\u2502",
+      "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502   \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502",
+      "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502   \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502",
+      "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502   \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502",
+      "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502   \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502",
+      "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518   \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502",
+      "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\u2502                                           \u2502\xB7\xB7\u2514\u2500\u2500\u2518\xB7\xB7\xB7\xB7\u250C\u2500\u2500\u2500\u2500\u2500\u2518",
+      "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\u2502                                           \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502      ",
+      "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\u2502                                           \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502      ",
+      "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510      \u250C\u2500\u2510       \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u250C\u2500\u2500\u2500\u2510",
+      "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502     \u250C\u2518\xB7\u2514\u2510      \u2502\xB7\xB7\u250C\u2500\u2500\u2510\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\u2502",
+      "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502    \u250C\u2518\xB7\xB7\xB7\u2514\u2510     \u2502\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\u2514\u2500\u2518\xB7\xB7\xB7\u2502",
+      "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\u250C\u2500\u2500\u2510\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502   \u250C\u2518\xB7\xB7\xB7\xB7\xB7\u2514\u2510    \u2502\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502",
+      "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502  \u250C\u2518\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2514\u2510   \u2502\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502",
+      "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502   \u2502\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\u250C\u2500\u2510\xB7\xB7\xB7\u2502",
+      "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502  \u2514\u2510\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u250C\u2518   \u2502\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\u2502",
+      "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502   \u2514\u2510\xB7\xB7\xB7\xB7\xB7\u250C\u2518    \u2502\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\u2502 \u2514\u2500\u2500\u2500\u2518",
+      "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502    \u2514\u2510\xB7\xB7\xB7\u250C\u2518     \u2502\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\u2502      ",
+      "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502     \u2514\u2510\xB7\u250C\u2518      \u2502\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\u2514\u2500\u2500\u2500\u2500\u2500\u2510",
+      "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502      \u2514\u2500\u2518       \u2502\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502",
+      "\u2502\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502                \u2502\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502",
+      "\u2502\xB7\xB7\u2502\u250C\u2518\xB7\xB7\xB7\u2514\u2510 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\u250C\u2500\u2500\u2510\xB7\xB7\u2502",
+      "\u2502\xB7\xB7\u2502\u2502\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\u2502",
+      "\u2502\xB7\xB7\u2502\u2502\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\u2502",
+      "\u2502\xB7\xB7\u2502\u2502\xB7\xB7\xB7\xB7\xB7\u2502 \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518  \u2502\xB7\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\u2502",
+      "\u2502\xB7\xB7\u2502\u2514\u2500\u2500\u2500\u2500\u2500\u2518                                               \u2502\xB7\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\u2502",
+      "\u2502\xB7\xB7\u2502               \u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\xB7\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\u2502",
+      "\u2502\xB7\xB7\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7o\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7o\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\u2502",
+      "\u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7o\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7o\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\u2502",
+      "\u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7o\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7o\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\u2502",
+      "\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7o\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7o\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502  \u2502\xB7\xB7\u2502",
+      "                    \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\xB7\xB7\xB7\xB7\xB7\u250C\u2500\u2500\u2500\u2500\u2500\u2518  \u2502\xB7\xB7\u2502",
+      "\u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510                                        \u2502\xB7\xB7\xB7\xB7\xB7\u2502        \u2502\xB7\xB7\u2502",
+      "\u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\xB7\xB7\xB7\xB7\xB7\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\xB7\xB7\u2502",
+      "\u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502",
+      "\u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502",
+      "\u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502",
+      "\u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502",
+      "\u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502",
+      "\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518"
+    ], {
+      width: 16,
+      height: 16,
+      "\xB7": () => [
+        origin("center"),
+        sprite("floor", { frame: ~~rand(0, 8) }),
+        layer("floor"),
+        "floor"
+      ],
+      "m": () => [
+        origin("center"),
+        sprite("milestone1"),
+        area(),
+        "milestone1"
+      ],
+      ")": () => [
+        origin("center"),
+        sprite("badge1")
+      ],
+      "(": () => [
+        origin("center"),
+        sprite("badge3")
+      ],
+      "}": () => [
+        origin("center"),
+        sprite("badge2")
+      ],
+      "1": () => [
+        origin("center"),
+        sprite("chest"),
+        area(),
+        solid(),
+        {
+          opened: false,
+          chest_index: 1
+        },
+        "chest"
+      ],
+      "2": () => [
+        origin("center"),
+        sprite("chest"),
+        area(),
+        solid(),
+        {
+          opened: false,
+          chest_index: 3
+        },
+        "chest"
+      ],
+      "\u2500": () => [
+        origin("center"),
+        sprite("wall"),
+        area(),
+        solid()
+      ],
+      "\u250C": () => [
+        origin("center"),
+        sprite("wall"),
+        area(),
+        solid()
+      ],
+      "\u2510": () => [
+        origin("center"),
+        sprite("wall"),
+        area(),
+        solid()
+      ],
+      "\u2514": () => [
+        origin("center"),
+        sprite("wall"),
+        area(),
+        solid()
+      ],
+      "\u2518": () => [
+        origin("center"),
+        sprite("wall"),
+        area(),
+        solid()
+      ],
+      "\u2502": () => [
+        origin("center"),
+        sprite("wall"),
+        area(),
+        solid()
+      ]
+    });
+    const player = add([
+      pos(map.getPos(2, 2)),
+      sprite("hero", { anim: "idle" }),
+      area({ width: 12, height: 12, offset: vec2(0, 6) }),
+      solid(),
+      origin("center")
+    ]);
+    player.onCollide("milestone1", () => {
+      const ogre = add([
+        sprite("ogre"),
+        pos(player.pos.sub(-100, 0)),
+        origin("center"),
+        area(),
+        solid(),
+        scale(0.5),
+        "ogre",
+        "enemy"
+      ]);
+    });
+    player.onCollide("enemy", () => {
+      shake(10);
+      PLAYER_HEALTH--;
+      if (PLAYER_HEALTH < 1) {
+        addKaboom();
+        go("lose");
+        return;
+      }
+      if (PLAYER_HEALTH < 10) {
+        addKaboom();
+        shake(120);
+        go("lose");
+        return;
+      }
+      if (PLAYER_HEALTH < 35) {
+        health.play("dying");
+        shake(30);
+        return;
+      }
+      if (PLAYER_HEALTH < 75) {
+        health.play("wounded");
+        shake(30);
+        return;
       }
     });
-    if (!interacted) {
-      sword.spin();
-      spawnBullet();
+    const sword = add([
+      pos(),
+      sprite("sword"),
+      origin("bot"),
+      rotate(0),
+      area(),
+      follow(player, vec2(-4, 9)),
+      spin(),
+      "sword"
+    ]);
+    onUpdate(() => {
+      every("ogre", (obj) => {
+        obj.move(-15, 0);
+        if (obj.pos.x < 0) {
+          destroy(obj);
+        }
+      });
+    });
+    function spin() {
+      let spinning = false;
+      return {
+        id: "spin",
+        update() {
+          if (spinning) {
+            this.angle += 800 * dt();
+            if (this.angle >= 360) {
+              this.angle = 0;
+              spinning = false;
+            }
+          }
+        },
+        spin() {
+          spinning = true;
+        }
+      };
     }
-  });
-  onCollide("bullet", "ogre", (b, e) => {
-    destroy(b);
-    destroy(e);
-    shake(2);
-  });
-  var SPEED = 120;
-  var dirs = {
-    "left": LEFT,
-    "right": RIGHT,
-    "up": UP,
-    "down": DOWN
-  };
-  player.onUpdate(() => {
-    camPos(player.pos);
-  });
-  onKeyDown("right", () => {
-    player.flipX(false);
-    sword.flipX(false);
-    player.move(SPEED, 0);
-    sword.follow.offset = vec2(-4, 9);
-    BULLET_DIRECTION = RIGHT;
-  });
-  onKeyDown("left", () => {
-    player.flipX(true);
-    sword.flipX(true);
-    player.move(-SPEED, 0);
-    sword.follow.offset = vec2(4, 9);
-    BULLET_DIRECTION = LEFT;
-  });
-  onKeyDown("up", () => {
-    player.move(0, -SPEED);
-  });
-  onKeyDown("down", () => {
-    player.move(0, SPEED);
-  });
-  onKeyPress(["left", "right", "up", "down"], () => {
-    player.play("run");
-  });
-  onKeyRelease(["left", "right", "up", "down"], () => {
-    if (!isKeyDown("left") && !isKeyDown("right") && !isKeyDown("up") && !isKeyDown("down")) {
-      player.play("idle");
+    __name(spin, "spin");
+    function updateChestCount(chestIndex) {
+      if (!CHESTS_UNLOCKED_STATUS[chestIndex].unlocked) {
+        CHESTS_UNLOCKED_COUNT++;
+        CHESTS_UNLOCKED_STATUS[chestIndex].unlocked = true;
+        chestUnlockedStatus.text = `chests unlocked ${CHESTS_UNLOCKED_COUNT} / 10`;
+        add([
+          sprite("coin", { anim: "idle" }),
+          layer("ui"),
+          pos(10 * CHESTS_UNLOCKED_COUNT, 12),
+          fixed()
+        ]);
+      }
     }
-  });
-  onUpdate("enemy", (element) => {
-    if (element.pos.x < 0) {
-      destroy(element);
+    __name(updateChestCount, "updateChestCount");
+    function showMessageText(chestPoolIndex) {
+      const textBox = add([
+        rect(width() - 30, 50, { radius: 16 }),
+        origin("center"),
+        color(255, 255, 255),
+        pos(player.pos.x, player.pos.y - height() / 4),
+        outline(2),
+        layer("onscreentext"),
+        "messagebox"
+      ]);
+      const textMessage = add([
+        text("", { size: 6, width: width() - 40, font: "apl386" }),
+        pos(textBox.pos),
+        color(0, 0, 0),
+        origin("center"),
+        layer("onscreentext"),
+        "messagebox"
+      ]);
+      MESSAGES_POOL_CURRENT = chestPoolIndex;
+      textMessage.text = MESSAGES_POOL[MESSAGES_POOL_CURRENT].message;
     }
+    __name(showMessageText, "showMessageText");
+    function spawnBullet(p) {
+      add([
+        rect(4, 2),
+        area(),
+        pos(player.pos.sub(0, 2)),
+        origin("center"),
+        color(255, 255, 255),
+        outline(1),
+        move(BULLET_DIRECTION, BULLET_SPEED),
+        cleanup(),
+        "bullet"
+      ]);
+    }
+    __name(spawnBullet, "spawnBullet");
+    onKeyPress("m", () => {
+      if (CHEST_OPEN) {
+        if (MESSAGES_POOL[MESSAGES_POOL_CURRENT].link) {
+          window.open(MESSAGES_POOL[MESSAGES_POOL_CURRENT].link, "_blank");
+        }
+      }
+    });
+    onKeyPress("space", () => {
+      let interacted = false;
+      every("chest", (c2) => {
+        if (player.isTouching(c2)) {
+          if (c2.opened) {
+            CHEST_OPEN = false;
+            c2.play("close");
+            c2.opened = false;
+            destroyAll("messagebox");
+          } else {
+            destroyAll("messagebox");
+            CHEST_OPEN = true;
+            c2.play("open");
+            c2.opened = true;
+            showMessageText(c2.chest_index);
+            updateChestCount(c2.chest_index);
+          }
+          interacted = true;
+        }
+      });
+      if (!interacted) {
+        sword.spin();
+        spawnBullet();
+      }
+    });
+    onCollide("bullet", "ogre", (b, e) => {
+      destroy(b);
+      destroy(e);
+      shake(2);
+    });
+    const SPEED = 120;
+    const dirs = {
+      "left": LEFT,
+      "right": RIGHT,
+      "up": UP,
+      "down": DOWN
+    };
+    player.onUpdate(() => {
+      camPos(player.pos);
+    });
+    onKeyDown("right", () => {
+      player.flipX(false);
+      sword.flipX(false);
+      player.move(SPEED, 0);
+      sword.follow.offset = vec2(-4, 9);
+      BULLET_DIRECTION = RIGHT;
+    });
+    onKeyDown("left", () => {
+      player.flipX(true);
+      sword.flipX(true);
+      player.move(-SPEED, 0);
+      sword.follow.offset = vec2(4, 9);
+      BULLET_DIRECTION = LEFT;
+    });
+    onKeyDown("up", () => {
+      player.move(0, -SPEED);
+    });
+    onKeyDown("down", () => {
+      player.move(0, SPEED);
+    });
+    onKeyPress(["left", "right", "up", "down"], () => {
+      player.play("run");
+    });
+    onKeyRelease(["left", "right", "up", "down"], () => {
+      if (!isKeyDown("left") && !isKeyDown("right") && !isKeyDown("up") && !isKeyDown("down")) {
+        player.play("idle");
+      }
+    });
+    onUpdate("enemy", (element) => {
+      if (element.pos.x < 0) {
+        destroy(element);
+      }
+    });
   });
+  scene("intro-1", () => {
+    wait(0, () => {
+      add([
+        text("Log4Game", {
+          size: 6,
+          font: "apl386"
+        }),
+        pos(width() / 2, height() / 2),
+        origin("center")
+      ]);
+    });
+    wait(3, () => {
+      add([
+        text("\n\n\n\nAn educational role playing game that is based", {
+          size: 6,
+          font: "apl386"
+        }),
+        pos(width() / 2, height() / 2),
+        origin("center")
+      ]);
+    });
+    wait(5, () => {
+      add([
+        text("\n\n\n\n\n\non the #LogShell security vulnerability that", {
+          size: 6,
+          font: "apl386"
+        }),
+        pos(width() / 2, height() / 2),
+        origin("center")
+      ]);
+    });
+    wait(7, () => {
+      add([
+        text("\n\n\n\n\n\n\n\ntook the world into a spin...", {
+          size: 6,
+          font: "apl386"
+        }),
+        pos(width() / 2, height() / 2),
+        origin("center")
+      ]);
+    });
+    wait(9, () => {
+      add([
+        text("press space to continue", {
+          size: 4,
+          font: "apl386"
+        }),
+        pos(width() / 2, height() - height() * 0.1),
+        origin("center")
+      ]);
+    });
+    keyPress("space", () => {
+      go("intro-2");
+    });
+  });
+  scene("intro-2", () => {
+    add([
+      text("this game is based on true events...", {
+        size: 6,
+        font: "apl386"
+      }),
+      pos(width() / 2, height() / 2),
+      origin("center")
+    ]);
+    wait(5, () => {
+      go("game");
+    });
+  });
+  go("intro-1");
 })();
 //# sourceMappingURL=game.js.map
