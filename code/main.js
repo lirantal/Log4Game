@@ -48,7 +48,7 @@ scene('game', () => {
     }
   }
 
-  const BULLET_SPEED = 35
+  const BULLET_SPEED = 55
   let BULLET_DIRECTION = RIGHT
   // the player can sustain up to 100 damage points
   // every time an enemy objects collides into the player
@@ -256,12 +256,13 @@ scene('game', () => {
     sprite("hero", { anim: "idle" }),
     area({ width: 12, height: 12, offset: vec2(0, 6) }),
     solid(),
+    scale(0.5),
     origin("center"),
   ])
 
   player.onCollide('milestone1', () => {
     const ogre = add([
-      sprite("ogre"),
+      sprite("monster1"),
       pos(player.pos.sub(-100,0)),
       origin("center"),
       area(),
@@ -320,7 +321,8 @@ scene('game', () => {
     origin("bot"),
     rotate(0),
     area(),
-    follow(player, vec2(-4, 9)),
+    scale(0.5),
+    follow(player, vec2(-2, 4)),
     spin(),
     'sword'
   ])
@@ -453,7 +455,7 @@ scene('game', () => {
       shake(2)
     })
 
-  const SPEED = 120
+  const SPEED = 45
 
   const dirs = {
     "left": LEFT,
@@ -470,7 +472,7 @@ scene('game', () => {
     player.flipX(false)
     sword.flipX(false)
     player.move(SPEED, 0)
-    sword.follow.offset = vec2(-4, 9)
+    sword.follow.offset = vec2(-2, 4)
     BULLET_DIRECTION = RIGHT
   })
 
@@ -478,7 +480,7 @@ scene('game', () => {
     player.flipX(true)
     sword.flipX(true)
     player.move(-SPEED, 0)
-    sword.follow.offset = vec2(4, 9)
+    sword.follow.offset = vec2(2, 4)
     BULLET_DIRECTION = LEFT
   })
 
@@ -588,8 +590,273 @@ scene('intro-2', () => {
 
   // transition to next scene after a few seconds
   wait(5, () => {
-    go('game');  
+    go('intro-3');  
   })
+})
+
+scene('intro-3', () => {
+  add([
+    text('On Dec 10th, 2021, a new, critical Log4j vulnerability was disclosed: Log4Shell.\nThis vulnerability within the popular Java logging framework was published\nas CVE-2021-44228 and categorized as Critical with a CVSS score of 10\n(the highest score possible).\n', {
+      size: 6,
+      font: 'apl386'
+    }),
+    pos(width()/2, height()/2),
+    origin('center')
+  ]);
+
+  wait(9, () => {
+    add([
+      text('press space to continue', {
+        size: 4,
+        font: 'apl386'
+      }),
+      pos(width()/2, height() - (height()*0.1)),
+      origin('center')
+    ]);
+  })
+  
+  keyPress('space', () => {
+    go('intro-4');
+  });
+})
+
+scene('intro-4', () => {
+  add([
+    text('The situation is rapidly escalating', {
+      size: 6,
+      font: 'apl386'
+    }),
+    pos(width()/2, height()/2),
+    origin('center')
+  ]);
+
+  wait(3, () => {
+    add([
+      text('\n\nnew vulnerabilities have been emerged in the form of CVE-2021-45046 and CVE-2021-45105', {
+        size: 6,
+        font: 'apl386'
+      }),
+      pos(width()/2, height()/2),
+      origin('center')
+    ]);
+  })
+
+  wait(6, () => {
+    add([
+      text('\n\n\n\nmalicious actors have been reported to be weaponizing exploits in the wild', {
+        size: 6,
+        font: 'apl386'
+      }),
+      pos(width()/2, height()/2),
+      origin('center')
+    ]);
+  })
+
+  let monster1
+  let monster2
+  let monster3
+  wait(6.6, () => {
+    monster1 = add([
+      sprite("monster1", { anim: 'run'}),
+      pos(10, (height() - (height()*0.3))),
+      origin("center"),
+      scale(0.3),
+      area(),
+      cleanup(),
+    ])
+  })
+
+  wait(7, () => {
+    monster2 = add([
+      sprite("monster2", { anim: 'run'}),
+      pos(width() - 10, (height() - (height()*0.35))),
+      origin("center"),
+      scale(0.3),
+      area(),
+      cleanup(),
+    ])
+  })
+
+  wait(8.4, () => {
+    monster3 = add([
+      sprite("monster3", { anim: 'run'}),
+      pos(width() - 10, (height() - (height()*0.25))),
+      origin("center"),
+      scale(0.3),
+      area(),
+      cleanup(),
+    ])
+  })
+
+  onUpdate(() => {
+    if (monster1) {
+      monster1.move(16, 0)
+    }
+
+    if (monster2) {
+      monster2.flipX(true)
+      monster2.move(-10, 0)
+    }
+
+    if (monster3) {
+      monster3.flipX(true)
+      monster3.move(-13, 0)
+    }
+  })
+
+  wait(9, () => {
+    add([
+      text('press space to continue', {
+        size: 4,
+        font: 'apl386'
+      }),
+      pos(width()/2, height() - (height()*0.1)),
+      origin('center')
+    ]);
+  })
+  
+  keyPress('space', () => {
+    go('intro-5');
+  });
+})
+
+scene('intro-5', () => {
+
+  const SPEED = 30
+  const BULLET_SPEED = 55
+  let BULLET_DIRECTION = RIGHT
+  
+  function spawnBullet(p) {
+    add([
+      rect(4, 2),
+      area(),
+      pos(player.pos.sub(0,2)),
+      origin("center"),
+      color(255, 255, 255),
+      outline(1),
+      move(BULLET_DIRECTION, BULLET_SPEED),
+      cleanup(),
+    ])
+  }
+
+  add([
+    text('You, Smithers,', {
+      size: 6,
+      font: 'apl386'
+    }),
+    pos(width()/2, height()/2),
+    origin('center')
+  ]);
+
+  wait(2, () => {
+    add([
+      text('\n\nhave been tasked with mitigating the vulnerability', {
+        size: 6,
+        font: 'apl386'
+      }),
+      pos(width()/2, height()/2),
+      origin('center')
+    ]);
+  })
+
+  let player
+  let sword
+  wait(3, () => {
+    player = add([
+      sprite("hero", { anim: 'idle'}),
+      pos(width()/2, (height() - (height()*0.6))),
+      origin("center"),
+      scale(0.5),
+      area(),
+      cleanup(),
+    ])
+  })
+
+  wait(6, () => {
+    player.play('run')
+
+    add([
+      text('\n\n\n\nUse your sword to shoot knives at malicious actors and stop attacks ', {
+        size: 6,
+        font: 'apl386'
+      }),
+      pos(width()/2, height()/2),
+      origin('center')
+    ]);
+  })
+
+  wait(8, () => {
+    sword = add([
+      pos(),
+      sprite("sword"),
+      origin("bot"),
+      rotate(0),
+      area(),
+      scale(0.3),
+      follow(player, vec2(-2, 4)),
+      'sword'
+    ])
+  })
+
+  wait(10, () => {
+
+    add([
+      text('\n\n\n\n\n\n\n\n[try to move around with arrow keys and hit space]', {
+        size: 6,
+        font: 'apl386'
+      }),
+      pos(width()/2, height()/2),
+      origin('center')
+    ]);
+
+    onKeyDown("right", () => {
+      player.flipX(false)
+      sword.flipX(false)
+      player.move(SPEED, 0)
+      sword.follow.offset = vec2(-2, 4)
+      BULLET_DIRECTION = RIGHT
+    })
+
+    onKeyDown("left", () => {
+      player.flipX(true)
+      sword.flipX(true)
+      player.move(-SPEED, 0)
+      sword.follow.offset = vec2(2, 4)
+      BULLET_DIRECTION = LEFT
+    })
+
+    onKeyDown("up", () => {
+      player.move(0, -SPEED)
+    })
+
+    onKeyDown("down", () => {
+      player.move(0, SPEED)
+    })
+
+    onKeyPress(["left", "right", "up", "down"], () => {
+      player.play("run")
+    })
+
+    onKeyRelease(["left", "right", "up", "down"], () => {
+      if (
+        !isKeyDown("left")
+        && !isKeyDown("right")
+        && !isKeyDown("up")
+        && !isKeyDown("down")
+      ) {
+        player.play("idle")
+      }
+    })
+
+    onKeyPress("space", () => {
+      spawnBullet()
+    })
+  })
+
+  wait(20, () => {
+    go('game')
+  })
+
 })
 
 go('intro-1')

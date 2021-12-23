@@ -66,9 +66,51 @@ export function loadAssets() {
 			"hit": 8
 		}
 	},
-	"ogre": {
+	"monster1": {
 		"x": 16,
 		"y": 320,
+		"width": 256,
+		"height": 32,
+		"sliceX": 8,
+		"anims": {
+			"idle": {
+				"from": 0,
+				"to": 3,
+				"speed": 3,
+				"loop": true
+			},
+			"run": {
+				"from": 4,
+				"to": 7,
+				"speed": 10,
+				"loop": true
+			}
+		}
+	},
+  "monster2": {
+		"x": 16,
+		"y": 368,
+		"width": 256,
+		"height": 32,
+		"sliceX": 8,
+		"anims": {
+			"idle": {
+				"from": 0,
+				"to": 3,
+				"speed": 3,
+				"loop": true
+			},
+			"run": {
+				"from": 4,
+				"to": 7,
+				"speed": 10,
+				"loop": true
+			}
+		}
+	},
+  "monster3": {
+		"x": 16,
+		"y": 272,
 		"width": 256,
 		"height": 32,
 		"sliceX": 8,
@@ -135,7 +177,7 @@ export function loadAssets() {
 		"sliceX": 3,
 		"sliceY": 3
 	},
-  "monster1": {
+  "monster5": {
 		"x": 370,
 		"y": 36,
 		"width": 48,
