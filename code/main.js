@@ -32,7 +32,7 @@ loadSound("sound-game", "sounds/lone-wolf-10374.mp3");
 // Music from <a href="https://pixabay.com/music/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=music&amp;utm_content=7017">Pixabay</a>
 loadSound("knife-thrust", "sounds/knife-thrust-into-wall-7017.mp3");
 
-const soundIntro = play('sound-intro', {loop: true});
+let soundIntro
 
 scene('game', () => {
   soundIntro.stop();
@@ -973,6 +973,24 @@ scene('credits-1', () => {
   })
 })
 
-go('credits-1')
+scene('credits-0', () => {
+  wait(1, () => {
+    add([  
+      text('press space to begin', {
+        size: 6,
+        font: 'apl386'
+      }),
+      pos(width()/2, height()/2),
+      origin('center')
+    ]);
+  })
+
+  onKeyPress('space', () => {
+    soundIntro = play('sound-intro', {loop: true});
+    go('credits-1')
+  })
+})
+
+go('credits-0')
 // shortcut to the game:
 // go('game')
