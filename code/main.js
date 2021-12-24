@@ -973,5 +973,6 @@ scene('credits-1', () => {
   })
 })
 
-// go('credits-1')
-go('game')
+go('credits-1')
+// shortcut to the game:
+// go('game')

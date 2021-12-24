@@ -3849,6 +3849,6 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       go("intro-1");
     });
   });
-  go("game");
+  go("credits-1");
 })();
 //# sourceMappingURL=game.js.map
