@@ -3100,9 +3100,9 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     const map = addLevel([
       "\u250C\u2500\u2500\u2500\u2500\u2500\u2510     \u250C\u2500\u2500)\u2500\u2500\u2500\u2500)\u2500\u2500\u2510     \u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510            \u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510",
       "\u2502\xB7\xB7\xB7\xB7\xB7\u2514\u2500\u2500\u2500\u2500\u2500\u2518\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2514\u2500\u2500\u2500\u2500\u2500\u2518\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502            \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502",
-      "\u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7m\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502            \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502",
-      "\u2502\xB7\xB7\xB71\xB7\xB7\xB72\xB7\xB7\xB7\xB7\xB7\xB7m\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2514\u2500\u2500\u2500}}\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\xB7\xB7\u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\xB7\xB7\u2502",
-      "\u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7m\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502            \u2502\xB7\xB7\u2502",
+      "\u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7m\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502            \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502",
+      "\u2502\xB7\xB7\xB71\xB7\xB7\xB7\xB7\xB7m\xB7\xB7\xB7\xB72\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2514\u2500\u2500\u2500}}\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\xB7\xB7\u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\xB7\xB7\u2502",
+      "\u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7m\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502            \u2502\xB7\xB7\u2502",
       "\u2502\xB7\xB7\xB7\xB7\xB7\u250C\u2500\u2500\u2500\u2500\u2500\u2510\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u250C\u2500\u2500\u2500\u2500\u2500\u2510\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510 \u2502\xB7\xB7\u2502",
       "\u2514\u2500\u2500\u2500\u2500\u2500\u2518     \u2514\u2500\u2500)\u2500\u2500\u2500\u2500)\u2500\u2500\u2518     \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500}}\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\u2502",
       "                                                  \u2502\xB7\xB7\u2502 \u2502\xB7\xB7\xB7\xB7\xB7\xB7\xB7\xB7\u2502 \u2502\xB7\xB7\u2502",
@@ -3271,16 +3271,32 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       origin("center")
     ]);
     player.onCollide("milestone1", () => {
-      const ogre = add([
-        sprite("monster1", { flipX: true, anim: "run" }),
-        pos(player.pos.sub(-100, 0)),
-        origin("center"),
-        area(),
-        solid(),
-        scale(0.5),
-        "ogre",
-        "enemy"
-      ]);
+      for (let x = 0; x <= 1; x++) {
+        wait(x, () => {
+          add([
+            sprite("monster1", { flipX: true, anim: "run" }),
+            pos(player.pos.sub(-100, 20)),
+            origin("center"),
+            area(),
+            solid(),
+            scale(0.5),
+            "ogre",
+            "enemy",
+            cleanup()
+          ]);
+          add([
+            sprite("monster1", { flipX: true, anim: "run" }),
+            pos(player.pos.sub(-100, -20)),
+            origin("center"),
+            area(),
+            solid(),
+            scale(0.5),
+            "ogre",
+            "enemy",
+            cleanup()
+          ]);
+        });
+      }
     });
     player.onCollide("enemy", () => {
       shake(10);
