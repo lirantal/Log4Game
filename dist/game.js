@@ -3020,7 +3020,24 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     background: [0, 0, 0]
   });
   loadAssets();
+  loadSprite("snyk-dog", "sprites/Idle.png", {
+    sliceX: 4,
+    sliceY: 1,
+    anims: {
+      idle: {
+        from: 0,
+        to: 3,
+        loop: true
+      }
+    }
+  });
+  loadSound("sound-intro", "sounds/under-pressure-michael-kobrin-105bpm-3781.mp3");
+  loadSound("sound-game", "sounds/lone-wolf-10374.mp3");
+  var soundIntro = play("sound-intro", { loop: true });
   scene("game", () => {
+    soundIntro.stop();
+    const soundGame = play("sound-game", { loop: true });
+    soundGame.play();
     let CHEST_OPEN = false;
     let CHESTS_UNLOCKED_COUNT = 0;
     const CHESTS_UNLOCKED_STATUS = {
@@ -3255,7 +3272,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     ]);
     player.onCollide("milestone1", () => {
       const ogre = add([
-        sprite("monster1"),
+        sprite("monster1", { flipX: true, anim: "run" }),
         pos(player.pos.sub(-100, 0)),
         origin("center"),
         area(),
@@ -3689,7 +3706,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     wait(6, () => {
       player.play("run");
       add([
-        text("\n\n\n\nUse your sword to shoot knives at malicious actors and stop attacks ", {
+        text("\n\n\n\nuse your sword to shoot knives at malicious actors and stop attacks ", {
           size: 6,
           font: "apl386"
         }),
@@ -3750,10 +3767,70 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
         spawnBullet();
       });
     });
-    wait(20, () => {
+    wait(17, () => {
+      soundIntro.volume(0.8);
+      wait(1, () => {
+        soundIntro.volume(0.6);
+      });
+      wait(3, () => {
+        soundIntro.volume(0.4);
+      });
+      wait(5, () => {
+        soundIntro.volume(0.3);
+      });
+      wait(7, () => {
+        soundIntro.volume(0.2);
+      });
+      wait(9, () => {
+        soundIntro.volume(0.1);
+      });
+      wait(11, () => {
+        go("intro-6");
+      });
+    });
+  });
+  scene("intro-6", () => {
+    wait(2, () => {
+      soundIntro.stop();
+      add([
+        text("Goodluck Smithers", {
+          size: 6,
+          font: "apl386"
+        }),
+        pos(width() / 2, height() / 2),
+        origin("center")
+      ]);
+    });
+    wait(6, () => {
       go("game");
     });
   });
-  go("intro-1");
+  scene("credits-1", () => {
+    wait(4, () => {
+      add([
+        text("a Snyk production", {
+          size: 6,
+          font: "apl386"
+        }),
+        pos(width() / 2, height() / 2),
+        origin("center")
+      ]);
+    });
+    wait(7, () => {
+      add([
+        pos(width() / 2, height() - height() * 0.4),
+        sprite("snyk-dog", { anim: "idle" }),
+        rotate(0),
+        area(),
+        origin("center"),
+        scale(0.5),
+        cleanup()
+      ]);
+    });
+    wait(13, () => {
+      go("intro-1");
+    });
+  });
+  go("game");
 })();
 //# sourceMappingURL=game.js.map

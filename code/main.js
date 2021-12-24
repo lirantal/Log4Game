@@ -10,7 +10,32 @@ kaboom({
 
 loadAssets()
 
+// graphics from craftpix.net, license: https://craftpix.net/file-licenses/
+loadSprite("snyk-dog", "sprites/Idle.png", {
+  sliceX: 4,
+  sliceY: 1,
+  anims: {
+    idle: {
+      from: 0,
+      to: 3,
+      loop: true
+    }
+  }
+});
+
+// Music by <a href="/users/michaelkobrin-21039285/?tab=audio&amp;utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=audio&amp;utm_content=3781">MichaelKobrin</a> from <a href="https://pixabay.com/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=music&amp;utm_content=3781">Pixabay</a>
+loadSound("sound-intro", "sounds/under-pressure-michael-kobrin-105bpm-3781.mp3");
+
+// Music by <a href="/users/guilhermebernardes-24203804/?tab=audio&amp;utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=audio&amp;utm_content=10374">GuilhermeBernardes</a> from <a href="https://pixabay.com/music/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=music&amp;utm_content=10374">Pixabay</a>
+loadSound("sound-game", "sounds/lone-wolf-10374.mp3");
+
+const soundIntro = play('sound-intro', {loop: true});
+
 scene('game', () => {
+  soundIntro.stop();
+
+  const soundGame = play('sound-game', {loop: true});
+  soundGame.play();
 
   let CHEST_OPEN = false
 
@@ -262,7 +287,7 @@ scene('game', () => {
 
   player.onCollide('milestone1', () => {
     const ogre = add([
-      sprite("monster1"),
+      sprite("monster1", { flipX: true, anim: 'run'}),
       pos(player.pos.sub(-100,0)),
       origin("center"),
       area(),
@@ -514,8 +539,6 @@ scene('game', () => {
     }
   })
 })
-
-
 
 scene('intro-1', () => {
   wait(0, () => {
@@ -776,7 +799,7 @@ scene('intro-5', () => {
     player.play('run')
 
     add([
-      text('\n\n\n\nUse your sword to shoot knives at malicious actors and stop attacks ', {
+      text('\n\n\n\nuse your sword to shoot knives at malicious actors and stop attacks ', {
         size: 6,
         font: 'apl386'
       }),
@@ -853,10 +876,81 @@ scene('intro-5', () => {
     })
   })
 
-  wait(20, () => {
-    go('game')
+  wait(17, () => {
+    // soundIntro.detune(-100),
+    soundIntro.volume(0.8)
+    wait(1, () => {
+      // soundIntro.detune(-300),
+      soundIntro.volume(0.6)
+    })
+    wait(3, () => {
+      // soundIntro.detune(-300),
+      soundIntro.volume(0.4)
+    })
+    wait(5, () => {
+      // soundIntro.detune(-500),
+      soundIntro.volume(0.3)
+    })
+    wait(7, () => {
+      // soundIntro.detune(-500),
+      soundIntro.volume(0.2)
+    })
+    wait(9, () => {
+      // soundIntro.detune(-500),
+      soundIntro.volume(0.1)
+    })
+    wait(11, () => {
+      go('intro-6')
+    })
   })
-
 })
 
-go('intro-1')
+scene('intro-6', () => {
+  wait(2, () => {
+    soundIntro.stop();
+    add([
+      text('Goodluck Smithers', {
+        size: 6,
+        font: 'apl386'
+      }),
+      pos(width()/2, height()/2),
+      origin('center')
+    ]);
+  })
+
+  wait(6, () => {
+    go('game')
+  })
+})
+
+scene('credits-1', () => {
+  wait(4, () => {
+    add([  
+      text('a Snyk production', {
+        size: 6,
+        font: 'apl386'
+      }),
+      pos(width()/2, height()/2),
+      origin('center')
+    ]);
+  })
+
+  wait(7, () => {
+    add([
+      pos(width()/2, (height() - (height()*0.4))),
+      sprite("snyk-dog", {anim: 'idle'}),
+      rotate(0),
+      area(),
+      origin('center'),
+      scale(0.5),
+      cleanup()
+    ])
+  })
+
+  wait(13, () => {
+    go('intro-1')
+  })
+})
+
+// go('credits-1')
+go('game')
