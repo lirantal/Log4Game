@@ -29,6 +29,9 @@ loadSound("sound-intro", "sounds/under-pressure-michael-kobrin-105bpm-3781.mp3")
 // Music by <a href="/users/guilhermebernardes-24203804/?tab=audio&amp;utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=audio&amp;utm_content=10374">GuilhermeBernardes</a> from <a href="https://pixabay.com/music/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=music&amp;utm_content=10374">Pixabay</a>
 loadSound("sound-game", "sounds/lone-wolf-10374.mp3");
 
+// Music from <a href="https://pixabay.com/music/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=music&amp;utm_content=7017">Pixabay</a>
+loadSound("knife-thrust", "sounds/knife-thrust-into-wall-7017.mp3");
+
 const soundIntro = play('sound-intro', {loop: true});
 
 scene('game', () => {
@@ -438,6 +441,7 @@ scene('game', () => {
   }
 
   function spawnBullet(p) {
+    play('knife-thrust')
     add([
       rect(4, 2),
       area(),

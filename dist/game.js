@@ -3033,6 +3033,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
   });
   loadSound("sound-intro", "sounds/under-pressure-michael-kobrin-105bpm-3781.mp3");
   loadSound("sound-game", "sounds/lone-wolf-10374.mp3");
+  loadSound("knife-thrust", "sounds/knife-thrust-into-wall-7017.mp3");
   var soundIntro = play("sound-intro", { loop: true });
   scene("game", () => {
     soundIntro.stop();
@@ -3398,6 +3399,7 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     }
     __name(showMessageText, "showMessageText");
     function spawnBullet(p) {
+      play("knife-thrust");
       add([
         rect(4, 2),
         area(),
