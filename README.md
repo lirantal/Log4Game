@@ -2,6 +2,10 @@
 
 Log4Game is an educational action Role-Playing Game (RPG) built with the JavaScript gaming framework Kaboom [kaboom](https://kaboomjs.com) to promote awareness of security in open source dependencies.
 
+Can you save the world, Smithers?
+
+[![log4game](https://repository-images.githubusercontent.com/440266170/fe6a788e-0a5b-4d38-8232-66ec3532b63b)](https://Log4Game.lirantal.repl.co)
+
 # Credits
 
 Log4Game features a collection of media assets that helped build the game and I'd like to thank the following authors:
