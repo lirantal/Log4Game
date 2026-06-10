@@ -1,4 +1,8 @@
 {
+	"publishConfig": {
+		"provenance": true,
+		"access": "public"
+	},
 	"name": "kaboom-env",
 	"dependencies": {
 		"@replit/database": "^2.0.1",
